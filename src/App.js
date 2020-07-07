@@ -8,7 +8,7 @@ import HomePage from "./pages/homepage/homepage.component";
 import ShopPage from "./pages/shop/shop.component";
 import SignInAndSignUpPage from "./pages/sign-in-and-sign-up/sign-in-and-sign-up.component";
 
-import { auth } from "./firebase/firebase.utils";
+import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
 
 /**
  * About Route
@@ -55,10 +55,25 @@ class App extends React.Component {
      * If we do nothing, Firebase will determine the active user in our app based on the last sign in activity.
      */
 
-    this.unsubscribeFromAuth = auth.onAuthStateChanged((user) => {
-      this.setState({ currentUser: user });
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+      if (userAuth) {
+        const userRef = await createUserProfileDocument(userAuth);
 
-      console.log(user);
+        // Listener for checking any change in the document
+        // Further info: https://firebase.google.com/docs/firestore/query-data/listen
+        userRef.onSnapshot((snapShot) => {
+          this.setState({
+            currentUser: {
+              id: snapShot.id,
+              ...snapShot.data(),
+            },
+          });
+
+          console.log(this.state);
+        });
+      } else {
+        this.setState({ currentUser: userAuth }, () => console.log(this.state));
+      }
     });
   }
 
