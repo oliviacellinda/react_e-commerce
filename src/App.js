@@ -1,5 +1,6 @@
 import React from "react";
 import { Switch, Route } from "react-router-dom";
+import { connect } from "react-redux";
 
 import "./App.css";
 
@@ -9,6 +10,8 @@ import ShopPage from "./pages/shop/shop.component";
 import SignInAndSignUpPage from "./pages/sign-in-and-sign-up/sign-in-and-sign-up.component";
 
 import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
+
+import { setCurrentUser } from "./redux/user/user.actions";
 
 /**
  * About Route
@@ -36,17 +39,23 @@ import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
  */
 
 class App extends React.Component {
-  constructor() {
-    super();
-
-    this.state = {
-      currentUser: null,
-    };
-  }
+  /**
+   * constructor() {
+   *   super();
+   *   this.state = {
+   *     currentUser: null,
+   *   };
+   * }
+   *
+   * We don't need this constructor anymore because it is replaced by redux reducer action
+   * as defined in the section below
+   */
 
   unsubscribeFromAuth = null;
 
   componentDidMount() {
+    const { setCurrentUser } = this.props;
+
     /**
      * auth.onAuthStateChanged() will return a function that will unsubscribe or sign out the linked account.
      *
@@ -54,23 +63,31 @@ class App extends React.Component {
      * there will be a communication between our app and Firebase to check if the account is still signed in.
      * If we do nothing, Firebase will determine the active user in our app based on the last sign in activity.
      */
-
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+      console.log(userAuth);
       if (userAuth) {
         const userRef = await createUserProfileDocument(userAuth);
 
         // Listener for checking any change in the document
         // Further info: https://firebase.google.com/docs/firestore/query-data/listen
         userRef.onSnapshot((snapShot) => {
-          this.setState({
-            currentUser: {
-              id: snapShot.id,
-              ...snapShot.data(),
-            },
+          /**
+           * this.setState({
+           *   currentUser: {
+           *     id: snapShot.id,
+           *     ...snapShot.data(),
+           *   },
+           * });
+           *
+           * Replace above setState code with the setCurrentUser action code
+           */
+          setCurrentUser({
+            id: snapShot.id,
+            ...snapShot.data(),
           });
         });
       } else {
-        this.setState({ currentUser: userAuth });
+        setCurrentUser(userAuth);
       }
     });
   }
@@ -82,7 +99,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <Header currentUser={this.state.currentUser} />
+        <Header />
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route exact path="/shop" component={ShopPage} />
@@ -93,4 +110,23 @@ class App extends React.Component {
   }
 }
 
-export default App;
+/**
+ * What is mapDispatchToProps? - https://stackoverflow.com/questions/39419237/what-is-mapdispatchtoprops
+ * Basically any action to be done to state is defined here
+ */
+
+const mapDispatchToProps = (dispatch) => ({
+  // user is a parameter, which is then used as payload (see user.action.js file)
+  setCurrentUser: (user) => dispatch(setCurrentUser(user)),
+});
+
+/**
+ * Aside from setting the currentUser value, the App component itself doesn't need that value
+ * Because of that, we don't need to pass the value as object like in the Header component
+ * Instead, we will pass null value as first parameter
+ *
+ * 1st parameter: mapStateToProps
+ * 2nd parameter: mapDispatchToProps
+ */
+
+export default connect(null, mapDispatchToProps)(App);
