@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 
 import "./App.css";
@@ -112,31 +112,46 @@ class App extends React.Component {
         <Header />
         <Switch>
           <Route exact path="/" component={HomePage} />
-          <Route exact path="/shop" component={ShopPage} />
-          <Route exact path="/signin" component={SignInAndSignUpPage} />
+          <Route path="/shop" component={ShopPage} />
+          <Route
+            exact
+            path="/signin"
+            render={() =>
+              this.props.currentUser ? (
+                <Redirect to="/" />
+              ) : (
+                <SignInAndSignUpPage />
+              )
+            }
+          />
         </Switch>
       </div>
     );
   }
 }
 
+const mapStateToProps = ({ user }) => ({
+  currentUser: user.currentUser,
+});
+
 /**
  * What is mapDispatchToProps? - https://stackoverflow.com/questions/39419237/what-is-mapdispatchtoprops
  * Basically any action to be done to state is defined here
+ *
+ * dispatch() is the method used to dispatch actions and trigger state changes to the store.
+ * https://stackoverflow.com/a/42871261
  */
-
 const mapDispatchToProps = (dispatch) => ({
   // user is a parameter, which is then used as payload (see user.action.js file)
   setCurrentUser: (user) => dispatch(setCurrentUser(user)),
 });
 
 /**
- * Aside from setting the currentUser value, the App component itself doesn't need that value
- * Because of that, we don't need to pass the value as object like in the Header component
- * Instead, we will pass null value as first parameter
+ * If we don't need/use the value from state in this component,
+ * pass null as the first parameter
  *
  * 1st parameter: mapStateToProps
  * 2nd parameter: mapDispatchToProps
  */
 
-export default connect(null, mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);
