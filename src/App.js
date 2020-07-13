@@ -65,11 +65,21 @@ class App extends React.Component {
      */
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
       console.log(userAuth);
+
       if (userAuth) {
         const userRef = await createUserProfileDocument(userAuth);
 
-        // Listener for checking any change in the document
-        // Further info: https://firebase.google.com/docs/firestore/query-data/listen
+        /**
+         * Listener for checking any change in the document
+         * Further info: https://firebase.google.com/docs/firestore/query-data/listen
+         *
+         * Instead of using get() method like in the firebase.utils.js,
+         * we use onSnapshot() method here to get the data from firebase
+         * The main difference between the two is get() only called once.
+         * On the opposite, with onSnapshot() method, each time the data changes,
+         * another call updates the document snapshot
+         * https://stackoverflow.com/questions/54479892/difference-between-get-and-snapshot-in-cloud-firestore
+         */
         userRef.onSnapshot((snapShot) => {
           /**
            * this.setState({
