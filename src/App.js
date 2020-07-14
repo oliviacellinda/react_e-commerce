@@ -13,8 +13,8 @@ import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
 
 import { setCurrentUser } from "./redux/user/user.actions";
 
+// About Route
 /**
- * About Route
  * When a component is set in Route, an object is passed as prop to the component (see below code).
  * By checking the prop through console.log, we can see that there are 3 objects inside.
  * 1. history (https://reacttraining.com/react-router/core/api/history) (https://drive.google.com/file/d/1fZPxYXhFMGC-4D8wOxvqkwvZjS4_4jqA/view?usp=sharing)
@@ -107,6 +107,10 @@ class App extends React.Component {
   }
 
   render() {
+    /**
+     * <Header currentUser={this.state.currentUser} />
+     * We don't need to pass the currentUser as props anymore because we already have redux
+     */
     return (
       <div>
         <Header />
