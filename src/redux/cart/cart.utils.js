@@ -11,5 +11,6 @@ export const addItemToCart = (cartItems, cartItemToAdd) => {
     );
   }
 
+  // Inject quantity prop for the 1st time
   return [...cartItems, { ...cartItemToAdd, quantity: 1 }];
 };
