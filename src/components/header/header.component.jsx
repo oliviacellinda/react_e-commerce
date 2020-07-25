@@ -1,13 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
+import { createStructuredSelector } from "reselect";
 
 import { auth } from "../../firebase/firebase.utils";
 
-import { ReactComponent as Logo } from "../../assets/crown.svg";
-
 import CartIcon from "../cart-icon/cart-icon.component";
 import CartDropdown from "../cart-dropdown/cart-dropdown.component";
+import { selectCartHidden } from "../../redux/cart/cart.selectors";
+import { selectCurrentUser } from "../../redux/user/user.selectors";
+
+import { ReactComponent as Logo } from "../../assets/crown.svg";
 
 import "./header.styles.scss";
 
@@ -47,10 +50,17 @@ const Header = ({ currentUser, hidden }) => (
    });
  */
 
-// Another way to destructure object
-const mapStateToProps = ({ user: { currentUser }, cart: { hidden } }) => ({
-  currentUser,
-  hidden,
+/**
+ * We don't need this piece of code anymore because we will replace it with memoized selectors
+ * // Another way to destructure object
+   const mapStateToProps = ({ user: { currentUser }, cart: { hidden } }) => ({
+     currentUser,
+     hidden,
+   });
+ */
+const mapStateToProps = createStructuredSelector({
+  currentUser: selectCurrentUser,
+  hidden: selectCartHidden,
 });
 
 // connect function gives us high-order component which we pass it the Header component
