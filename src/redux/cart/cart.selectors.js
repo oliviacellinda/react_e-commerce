@@ -35,6 +35,14 @@ export const selectCartItemsCount = createSelector(
     )
 );
 
+export const selectCartTotal = createSelector([selectCartItems], (cartItems) =>
+  cartItems.reduce(
+    (accumulatedQuantity, cartItem) =>
+      accumulatedQuantity + cartItem.quantity * cartItem.price,
+    0
+  )
+);
+
 /**
  * About Memoization
  * Whenever a part of state tree is updated, every component using state value will re-render
