@@ -1,0 +1,9 @@
+{
+  "workbench.colorTheme": "Snazzy Operator",
+  "editor.fontFamily": "'Operator Mono Lig', 'Hasklig', 'Fira Code', Consolas, 'Courier New', monospace",
+  "editor.fontLigatures": true,
+  "editor.fontWeight": "200",
+  "editor.fontSize": 14,
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true
+}
